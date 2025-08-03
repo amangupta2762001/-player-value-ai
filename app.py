@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify
 import joblib
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-# ✅ Add root route to verify API is live
+# Health check route
 @app.route('/')
 def home():
     return jsonify({"message": "API is working"}), 200
@@ -13,7 +14,6 @@ def home():
 @app.route('/predict', methods=['POST', 'OPTIONS'])
 def predict():
     if request.method == 'OPTIONS':
-        # Preflight request handling for CORS
         return jsonify({}), 200
 
     data = request.get_json()
@@ -38,11 +38,12 @@ def predict():
 
         # Predict
         prediction = model.predict(features)[0]
-
         return jsonify({"predicted_value_million_eur": round(prediction, 2)})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# ✅ IMPORTANT for Render to detect the open port
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
