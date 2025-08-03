@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Player Market Value Predictor</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .result {
+      margin-top: 25px;
+      padding: 15px;
+      background-color: #e9f7ef;
+      border-left: 5px solid #28a745;
+      color: #155724;
+      border-radius: 8px;
+      font-size: 18px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Player Market Value Predictor</h1>
+
+    <label for="age">Age</label>
+    <input type="number" id="age" required>
+
+    <label for="goals">Goals</label>
+    <input type="number" id="goals" required>
+
+    <label for="assists">Assists</label>
+    <input type="number" id="assists" required>
+
+    <label for="appearances">Appearances</label>
+    <input type="number" id="appearances" required>
+
+    <label for="club_rank">Club Rank (1 = Best)</label>
+    <input type="number" id="club_rank" required>
+
+    <label for="position">Position</label>
+    <select id="position">
+      <option>Forward</option>
+      <option>Midfielder</option>
+      <option>Defender</option>
+    </select>
+
+    <button onclick="predict()">Predict Market Value</button>
+
+    <div class="result" id="resultBox"></div>
+  </div>
+
+  <script>
+    function predict() {
+      const age = parseInt(document.getElementById('age').value);
+      const goals = parseInt(document.getElementById('goals').value);
+      const assists = parseInt(document.getElementById('assists').value);
+      const appearances = parseInt(document.getElementById('appearances').value);
+      const club_rank = parseInt(document.getElementById('club_rank').value);
+      const position = document.getElementById('position').value;
+
+      fetch('http://127.0.0.1:5000/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ age, goals, assists, appearances, club_rank, position })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const box = document.getElementById('resultBox');
+        if (data.predicted_value_million_eur !== undefined) {
+          box.style.display = 'block';
+          box.innerText = `💰 Predicted Market Value: €${data.predicted_value_million_eur} million`;
+        } else {
+          box.style.display = 'block';
+          box.innerText = `⚠️ Error: ${data.error || 'Unknown issue'}`;
+        }
+      })
+      .catch(error => {
+        const box = document.getElementById('resultBox');
+        box.style.display = 'block';
+        box.innerText = `❌ Failed to connect to server: ${error}`;
+      });
+    }
+  </script>
+
+</body>
+</html>
