@@ -113,7 +113,7 @@
       const club_rank = parseInt(document.getElementById('club_rank').value);
       const position = document.getElementById('position').value;
 
-      fetch('http://127.0.0.1:5000/predict', {
+      fetch('https://player-value-ai.onrender.com/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ age, goals, assists, appearances, club_rank, position })
