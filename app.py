@@ -5,10 +5,15 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# ✅ Add root route to verify API is live
+@app.route('/')
+def home():
+    return jsonify({"message": "API is working"}), 200
+
 @app.route('/predict', methods=['POST', 'OPTIONS'])
 def predict():
     if request.method == 'OPTIONS':
-        # Respond to preflight CORS request
+        # Preflight request handling for CORS
         return jsonify({}), 200
 
     data = request.get_json()
