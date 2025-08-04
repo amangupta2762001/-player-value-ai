@@ -115,24 +115,29 @@
 
       fetch('https://player-value-ai.onrender.com/predict', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({ age, goals, assists, appearances, club_rank, position })
       })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return response.json();
+      })
       .then(data => {
         const box = document.getElementById('resultBox');
+        box.style.display = 'block';
         if (data.predicted_value_million_eur !== undefined) {
-          box.style.display = 'block';
           box.innerText = `💰 Predicted Market Value: €${data.predicted_value_million_eur} million`;
         } else {
-          box.style.display = 'block';
           box.innerText = `⚠️ Error: ${data.error || 'Unknown issue'}`;
         }
       })
       .catch(error => {
         const box = document.getElementById('resultBox');
         box.style.display = 'block';
-        box.innerText = `❌ Failed to connect to server: ${error}`;
+        box.innerText = `❌ Failed to connect to server: ${error.message}`;
       });
     }
   </script>
